@@ -27,25 +27,76 @@ var quotes = [
   }
 ];
 
+var newQuotes = [
+  {
+    quote: "Houston, we have a problem.",
+    movie: "Apollo 13",
+    year: 1995,
+    rating: "PG-13"
+  }, {
+    quote: "Gentlemen, you can't fight in here! This is the war room!",
+    movie: "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+    year: 1964,
+    rating: "PG"
+  }
+];
+
 var colors = {
-    "G": "#3cff00",
-    "PG" : "#f9ff00",
-    "PG-13" : "#ff9000",
-    "R" : "ff0000"
-}
+  "G": "#3cff00",
+  "PG": "#f9ff00",
+  "PG-13": "#ff9000",
+  "R": "#ff0000"
+};
+
+var add = d3.select("#add");
+
+add.on('click', function(){
+  quotes = quotes.concat(newQuotes);
+
+  var listItems = d3.select("#quotes")
+    .selectAll("li")
+    .data(quotes);
+    listItems
+    .enter()
+    .append("li")
+      .text(d => '"' + d.quote + '" - ' + d.movie + ' (' + d.year + ')')
+      .style("margin", "20px")
+      .style("padding", "0px")
+      .style("font-size", d => d.quote.length < 25 ? "2em" : "1em")
+      .style("background-color", d => colors[d.rating])
+      .style("border-radius", "8px")
+    .merge(listItems)
+      .style("color", "#5599ff");
+    
+  add.remove();
+});
 
 d3.select("#quotes")
     .style("list-style", "none")
-    .selectAll("li")
-    .data(quotes)
-    .enter()
-    .append("li")
-    .text(d => '"'+ d.quote + " - " + d.movie + " - " + d.year
-       
-    )
+  .selectAll("li")
+  .data(quotes)
+  .enter()
+  .append("li")
+    .text(d => '"' + d.quote + '" - ' + d.movie + ' (' + d.year + ')')
     .style("margin", "20px")
     .style("padding", "20px")
-    .style("font-size", d  => d.quote.length < 25 ? "2em" : "1em")
+    .style("font-size", d => d.quote.length < 25 ? "2em" : "1em")
     .style("background-color", d => colors[d.rating])
-    .style("border-radius", "8px");   
-    
+    .style("border-radius", "8px");
+
+var removeBtn = d3.select("#remove");
+
+removeBtn.on('click', function() {
+  var nonRQuotes = quotes.filter(function(movie) {
+    return movie.rating !== 'R';
+  });
+  
+  d3.selectAll("li")
+    .data(nonRQuotes, function(d) {
+      return d.quote;
+    })
+    .exit()
+    .remove();
+
+  removeBtn.remove();
+});

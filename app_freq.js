@@ -1,4 +1,15 @@
 // write your code here!
+d3.select("#reset")
+    .on("click", function(){
+        d3.selectAll(".letter")
+            .remove();
+
+        d3.select("#phrase")
+            .text("");
+
+        d3.select("#count")
+            .text("");
+    });
 
 d3.select("form")
     .on("submit", function(){
@@ -6,12 +17,22 @@ d3.select("form")
         var input = d3.select("input");
         var text = input.property("value");
 
-        d3.select("#letters")
+        var letters = d3.select("#letters")
             .selectAll(".letter")
-            .data(getFrequencies(text))
+            .data(getFrequencies(text), function(d){
+                return d.character;
+            });
+
+        letters.classed("new", false)
+            .exit()
+            .remove();
+            
+        letters
             .enter()
             .append("div")
                 .classed("letter", true)
+                .classed("new", true)
+            .merge(letters)
                 .style("width", "20px")
                 .style("line-height", "20px")
                 .style("margin-right", "5px")
@@ -24,7 +45,10 @@ d3.select("form")
 
         d3.select("#phrase")
             .text("Analysis of " + text);
+        d3.select("#count")
+            .text("(New characters: " + letters.enter().nodes().length+ ")");
 
+        input.property("value","");
     });
 
 

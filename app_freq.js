@@ -1,4 +1,12 @@
 // write your code here!
+var width = 800;
+var height = 400;
+var barPadding= 10;
+var svg = d3.select("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+
 d3.select("#reset")
     .on("click", function(){
         d3.selectAll(".letter")
@@ -16,10 +24,12 @@ d3.select("form")
         d3.event.preventDefault();
         var input = d3.select("input");
         var text = input.property("value");
+        var data = getFrequencies(text);
+        var barWidth = width/data.length - barPadding;
 
-        var letters = d3.select("#letters")
+        var letters = svg
             .selectAll(".letter")
-            .data(getFrequencies(text), function(d){
+            .data(data, function(d){
                 return d.character;
             });
 
@@ -29,20 +39,22 @@ d3.select("form")
             
         letters
             .enter()
-            .append("div")
+            .append("rect")
                 .classed("letter", true)
                 .classed("new", true)
             .merge(letters)
-                .style("width", "20px")
-                .style("line-height", "20px")
-                .style("margin-right", "5px")
+                .style("width", barWidth)
+                
                 .style("height", function(d){
-                    return d.count * 20 + "px"
+                    return d.count * 20;
                 })
-                .text(function(d){
-                    return d.character;
+                .attr("x", function(d, i){
+                    return (barWidth + barPadding) *  i;
+                })
+                .attr("y", function(d){
+                    return height - d.count * 20;
                 });
-
+                
         d3.select("#phrase")
             .text("Analysis of " + text);
         d3.select("#count")
